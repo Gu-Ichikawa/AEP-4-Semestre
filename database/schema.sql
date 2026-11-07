@@ -71,3 +71,4 @@ CREATE TABLE conquista (
     CONSTRAINT uq_conquista_nome
         UNIQUE (nome)
 );
+
