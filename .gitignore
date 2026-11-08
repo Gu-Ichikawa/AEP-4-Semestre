@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Saída de compilação com variável do Maven não resolvida ###
+${project.build.directory}/
