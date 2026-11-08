@@ -1,3 +1,8 @@
+-- ATENÇÃO: o DROP apaga o banco inteiro e todos os dados.
+-- Use apenas em ambiente de desenvolvimento.
+-- Ordem de execução: 1) schema.sql  2) seed.sql  3) dados-teste.sql
+DROP DATABASE IF EXISTS hemoplay;
+
 CREATE DATABASE hemoplay
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_0900_ai_ci;
@@ -45,7 +50,8 @@ CREATE TABLE local_doacao (
     estado VARCHAR(2) NOT NULL,
     endereco VARCHAR(100) NOT NULL,
     cidade VARCHAR(30) NOT NULL,
-    horario_funcionamento VARCHAR(100) NULL     
+    horario_funcionamento VARCHAR(100) NULL,
+    descricao VARCHAR(500) NULL
 );
 
 CREATE TABLE evento (
