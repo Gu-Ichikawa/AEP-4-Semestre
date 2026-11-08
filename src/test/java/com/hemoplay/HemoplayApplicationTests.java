@@ -1,4 +1,4 @@
-package hemoplay.hemoplay;
+package com.hemoplay;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

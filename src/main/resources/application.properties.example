@@ -1,0 +1,8 @@
+spring.application.name=hemoplay
+
+# Conexão com o MySQL local
+spring.datasource.url=jdbc:mysql://localhost:3306/hemoplay
+spring.datasource.username=root
+spring.datasource.password=SUA_SENHA_AQUI
+
+spring.jpa.hibernate.ddl-auto=validate

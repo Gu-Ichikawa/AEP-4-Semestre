@@ -34,3 +34,7 @@ build/
 
 ### Saída de compilação com variável do Maven não resolvida ###
 ${project.build.directory}/
+
+
+### Configuração local (contém senha) ###
+src/main/resources/application.properties
