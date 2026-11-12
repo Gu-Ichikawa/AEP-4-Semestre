@@ -10,6 +10,8 @@ public class ResponsavelHemocentro extends Usuario {
 
     @Override
     public List<String> obterPermissoes() {
-        return List.of("atualizarLocal", "gerenciarCampanhas");
+    return List.of("confirmarDoacao", "atualizarLocal", "gerenciarCampanhas");
     }
+
+    
 }

@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "doacao")
@@ -36,6 +38,7 @@ public class Doacao {
     private LocalDateTime dataConfirmacao;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "status", nullable = false, length = 20)
     private StatusDoacao status;
 
@@ -49,8 +52,10 @@ public class Doacao {
         this.status = StatusDoacao.REGISTRADA;
     }
 
-    // Só muda o estado. Quem pode chamar isso (administrador) é decidido no DoacaoService.
     public void confirmar(LocalDateTime momento) {
+        if (this.status == StatusDoacao.CONFIRMADA) {
+            throw new IllegalStateException("Esta doação já foi confirmada.");
+        }
         this.status = StatusDoacao.CONFIRMADA;
         this.dataConfirmacao = momento;
     }

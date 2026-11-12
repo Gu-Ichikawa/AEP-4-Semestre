@@ -89,4 +89,6 @@ public abstract class Usuario {
     public void setTipoSanguineo(TipoSanguineo tipoSanguineo) { this.tipoSanguineo = tipoSanguineo; }
     public Nivel getNivel() { return nivel; }
     public void setNivel(Nivel nivel) { this.nivel = nivel; }
+    public boolean possuiPermissao(String permissao) {return obterPermissoes().contains(permissao);}
+    
 }
