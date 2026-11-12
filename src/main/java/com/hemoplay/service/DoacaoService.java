@@ -1,9 +1,7 @@
 package com.hemoplay.service;
 
-import com.hemoplay.model.Administrador;
 import com.hemoplay.model.Doacao;
 import com.hemoplay.model.LocalDoacao;
-import com.hemoplay.model.StatusDoacao;
 import com.hemoplay.model.Usuario;
 import com.hemoplay.repository.DoacaoRepository;
 import com.hemoplay.repository.LocalDoacaoRepository;
@@ -29,7 +27,8 @@ public class DoacaoService {
         this.localDoacaoRepository = localDoacaoRepository;
     }
 
-    // RF05: o doador registra a doação. Ela fica REGISTRADA até um administrador confirmar.
+    // RF05: o doador registra a doação. Ela fica REGISTRADA até ser confirmada
+    // por um Administrador ou por um Responsável pelo Hemocentro.
     public Doacao registrar(Long idUsuario, Long idLocal) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
@@ -43,23 +42,21 @@ public class DoacaoService {
         return doacaoRepository.save(new Doacao(usuario, local));
     }
 
-    // RF05: só um administrador pode confirmar. Aqui o polimorfismo aparece na prática:
-    // a checagem usa o tipo real do objeto (Administrador ou não).
-    public Doacao confirmar(Long idDoacao, Long idAdministrador) {
-        Usuario quemConfirma = usuarioRepository.findById(idAdministrador)
+    // RF05: Administrador ou Responsável pelo Hemocentro podem confirmar.
+    // Polimorfismo: possuiPermissao() usa o obterPermissoes() da subclasse real do usuário,
+    // sem precisar perguntar qual é o tipo dele.
+    public Doacao confirmar(Long idDoacao, Long idUsuarioConfirmacao) {
+        Usuario quemConfirma = usuarioRepository.findById(idUsuarioConfirmacao)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        if (!(quemConfirma instanceof Administrador)) {
-            throw new IllegalStateException("Somente administradores podem confirmar doações");
+        if (!quemConfirma.possuiPermissao("confirmarDoacao")) {
+            throw new IllegalStateException("Este usuário não tem permissão para confirmar doações");
         }
 
         Doacao doacao = doacaoRepository.findById(idDoacao)
                 .orElseThrow(() -> new IllegalArgumentException("Doação não encontrada"));
 
-        if (doacao.getStatus() == StatusDoacao.CONFIRMADA) {
-            throw new IllegalStateException("Doação já confirmada");
-        }
-
+        // A própria Doacao recusa uma segunda confirmação
         doacao.confirmar(LocalDateTime.now());
         return doacao; // gravado ao fim da transação
     }

@@ -17,7 +17,7 @@ public class TratadorDeErros {
                 .body(Map.of("erro", ex.getMessage()));
     }
 
-    // Regra de negócio violada (doação já confirmada, não administrador confirmando): 409
+    // Regra de negócio violada (doação já confirmada, usuário sem permissão para confirmar): 409
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, String>> regraViolada(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)

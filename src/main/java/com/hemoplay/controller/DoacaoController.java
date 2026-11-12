@@ -32,11 +32,11 @@ public class DoacaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(DoacaoResponse.from(doacao));
     }
 
-    // RF05: só administrador confirma (status CONFIRMADA)
+    // RF05: Administrador ou Responsável pelo Hemocentro confirmam (status CONFIRMADA)
     @PatchMapping("/doacoes/{id}/confirmar")
     public DoacaoResponse confirmar(@PathVariable Long id,
                                     @Valid @RequestBody ConfirmarDoacaoRequest request) {
-        Doacao doacao = doacaoService.confirmar(id, request.idAdministrador());
+        Doacao doacao = doacaoService.confirmar(id, request.idUsuarioConfirmacao());
         return DoacaoResponse.from(doacao);
     }
 

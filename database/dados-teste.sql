@@ -95,6 +95,12 @@ INSERT INTO item (nome, descricao, tipo, imagem, requisito_desbloqueio) VALUES
 INSERT INTO usuario (tipo_usuario, nome, email, senha, data_nasc, telefone, pontuacao, mascote_cor, mascote_acessorios, id_tipo_sanguineo, id_nivel) VALUES
 ('DOADOR', 'Usuário de Teste', 'teste@hemoplay.exemplo', 'SENHA_DE_EXEMPLO_NAO_USAR', '1995-05-20', '(00) 90000-0000', 240, 'vermelho', NULL, 7, 2);
 
+-- Usuários que podem confirmar doações (RF05): id 2 = Administrador, id 3 = Responsável pelo Hemocentro.
+-- Use um deles no PATCH /doacoes/{id}/confirmar, com o JSON { "idUsuarioConfirmacao": 2 }
+INSERT INTO usuario (tipo_usuario, nome, email, senha, pontuacao, id_nivel) VALUES
+('ADMINISTRADOR', 'Admin de Teste', 'admin@hemoplay.exemplo', 'SENHA_DE_EXEMPLO_NAO_USAR', 0, 1),
+('RESPONSAVEL_HEMOCENTRO', 'Responsável de Teste', 'responsavel@hemoplay.exemplo', 'SENHA_DE_EXEMPLO_NAO_USAR', 0, 1);
+
 -- 9. Notificações (RF13) -> 6 registros, uma de cada tipo previsto
 INSERT INTO notificacao (id_usuario, titulo, mensagem, tipo, data_envio, lida) VALUES
 (1, 'Nova campanha disponível',  'A campanha do tipo O negativo está ativa.',                         'CAMPANHA',   '2026-11-07 09:00:00', FALSE),
