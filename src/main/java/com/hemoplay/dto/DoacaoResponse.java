@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 public record DoacaoResponse(
         Long id,
+        Long idUsuario,
+        String nomeUsuario,
         String status,
         LocalDateTime dataRegistro,
         LocalDateTime dataConfirmacao,
@@ -14,6 +16,8 @@ public record DoacaoResponse(
     public static DoacaoResponse from(Doacao doacao) {
         return new DoacaoResponse(
                 doacao.getIdDoacao(),
+                doacao.getUsuario().getIdUsuario(),
+                doacao.getUsuario().getNome(),
                 doacao.getStatus().name(),
                 doacao.getDataRegistro(),
                 doacao.getDataConfirmacao(),

@@ -17,7 +17,6 @@ public record UsuarioResponse(
         List<String> permissoes
 ) {
 
-    // A senha não está nesta lista de propósito
     public static UsuarioResponse from(Usuario usuario) {
         return new UsuarioResponse(
                 usuario.getIdUsuario(),

@@ -1,6 +1,3 @@
--- ATENÇÃO: o DROP apaga o banco inteiro e todos os dados.
--- Use apenas em ambiente de desenvolvimento.
--- Ordem de execução: 1) schema.sql  2) seed.sql  3) dados-teste.sql
 DROP DATABASE IF EXISTS hemoplay;
 
 CREATE DATABASE hemoplay

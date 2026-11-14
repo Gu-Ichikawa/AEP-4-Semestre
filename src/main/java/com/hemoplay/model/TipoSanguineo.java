@@ -21,7 +21,6 @@ public class TipoSanguineo {
     @Column(name = "tipo", nullable = false, length = 2)
     private String tipo;
 
-    // fator_rh é CHAR(1) no banco. Essa anotação avisa o Hibernate para não reclamar do tipo.
     @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "fator_rh", nullable = false, length = 1)
     private String fatorRh;
@@ -34,6 +33,6 @@ public class TipoSanguineo {
     public String getFatorRh() { return fatorRh; }
 
     public String getRotulo() {
-        return tipo + fatorRh; // exemplo: "O+"
+        return tipo + fatorRh;
     }
 }

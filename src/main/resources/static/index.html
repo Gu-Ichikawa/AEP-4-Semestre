@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HemoPlay</title>
+    <meta name="description" content="Plataforma gamificada de incentivo à doação de sangue">
+    <meta name="theme-color" content="#1b1429">
+    <link rel="icon" href="img/mascote/cor-vermelha.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<div class="entrada" id="entrada" hidden>
+    <header class="entrada-topo">
+        <span class="marca">HemoPlay</span>
+    </header>
+    <main class="entrada-corpo">
+        <section class="entrada-apresentacao" aria-labelledby="titulo-entrada">
+            <img class="entrada-mascote" src="img/mascote/cor-vermelha.jpg" alt="Mascote do HemoPlay: um morcego vermelho sorridente" width="480" height="480">
+            <h1 id="titulo-entrada">Doe sangue e faça o seu mascote evoluir.</h1>
+            <p>Cada doação confirmada pelo hemocentro vale pontos. Com eles você sobe de nível, completa missões
+                e libera novos visuais para o seu mascote.</p>
+        </section>
+
+        <div class="entrada-acoes">
+            <form class="cartao formulario" id="form-cadastro" novalidate>
+                <h2>Criar conta</h2>
+                <div class="campo">
+                    <label for="cad-nome">Nome completo</label>
+                    <input id="cad-nome" name="nome" required maxlength="120" autocomplete="name">
+                </div>
+                <div class="campo">
+                    <label for="cad-email">E-mail</label>
+                    <input id="cad-email" name="email" type="email" required maxlength="150" autocomplete="email">
+                </div>
+                <div class="campo">
+                    <label for="cad-senha">Senha</label>
+                    <input id="cad-senha" name="senha" type="password" required minlength="6" maxlength="72" autocomplete="new-password">
+                    <small>Entre 6 e 72 caracteres.</small>
+                </div>
+                <div class="campos-linha">
+                    <div class="campo">
+                        <label for="cad-nasc">Data de nascimento</label>
+                        <input id="cad-nasc" name="dataNasc" type="date">
+                    </div>
+                    <div class="campo">
+                        <label for="cad-telefone">Telefone</label>
+                        <input id="cad-telefone" name="telefone" maxlength="20" autocomplete="tel" placeholder="(44) 99999-0000">
+                    </div>
+                </div>
+                <div class="campo">
+                    <label for="cad-tipo">Tipo sanguíneo</label>
+                    <select id="cad-tipo" name="idTipoSanguineo" data-tipos>
+                        <option value="">Não sei ou prefiro não informar</option>
+                    </select>
+                    <small>Informar o tipo conclui a missão "Completar o cadastro".</small>
+                </div>
+                <p class="erro-form" role="alert" hidden></p>
+                <button type="submit" class="botao">Criar conta</button>
+            </form>
+
+            <form class="cartao formulario entrar" id="form-entrar" novalidate>
+                <h2>Já tenho conta</h2>
+                <p class="ajuda">O login com senha fica para a próxima entrega. Por enquanto, entre com o número do seu usuário.</p>
+                <div class="entrar-linha">
+                    <div class="campo">
+                        <label for="entrar-id">ID do usuário</label>
+                        <input id="entrar-id" name="id" type="number" min="1" required>
+                    </div>
+                    <button type="submit" class="botao botao-secundario">Entrar</button>
+                </div>
+                <div class="contas-teste">
+                    <span>Contas do dados-teste.sql:</span>
+                    <button type="button" class="botao-link" data-entrar="1">Doador (1)</button>
+                    <button type="button" class="botao-link" data-entrar="2">Administrador (2)</button>
+                    <button type="button" class="botao-link" data-entrar="3">Responsável (3)</button>
+                </div>
+                <p class="erro-form" role="alert" hidden></p>
+            </form>
+        </div>
+    </main>
+</div>
+
+<div class="app" id="app" hidden>
+    <header class="topo">
+        <a class="marca" href="#inicio">HemoPlay</a>
+        <nav class="menu" aria-label="Seções">
+            <a href="#inicio" data-aba="inicio">Início</a>
+            <a href="#doacoes" data-aba="doacoes">Doações</a>
+            <a href="#missoes" data-aba="missoes">Missões</a>
+            <a href="#mascote" data-aba="mascote">Mascote</a>
+            <a href="#hemocentros" data-aba="hemocentros">Hemocentros</a>
+            <a href="#como-doar" data-aba="como-doar">Como doar</a>
+            <a href="#painel" data-aba="painel" data-so-confirmador hidden>Painel do hemocentro</a>
+        </nav>
+        <div class="topo-direita">
+            <div class="sino">
+                <button type="button" class="botao-icone" id="botao-sino" aria-expanded="false" aria-controls="painel-avisos">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 15.4A1 1 0 0 0 5.2 17h13.6a1 1 0 0 0 .9-1.6L18 12.6V9a6 6 0 0 0-6-6Zm-2.5 15.5a2.5 2.5 0 0 0 5 0"/></svg>
+                    <span class="sr-only">Notificações</span>
+                    <span class="sino-contador" id="sino-contador" hidden></span>
+                </button>
+                <div class="painel-avisos" id="painel-avisos" hidden>
+                    <h2>Notificações</h2>
+                    <ol id="lista-notificacoes"></ol>
+                </div>
+            </div>
+            <a class="topo-usuario" href="#perfil" id="topo-usuario">
+                <img id="topo-mascote" src="img/mascote/cor-vermelha.jpg" alt="" width="36" height="36">
+                <span id="topo-nome"></span>
+            </a>
+            <button type="button" class="botao-link" id="botao-sair">Sair</button>
+        </div>
+    </header>
+
+    <main class="conteudo">
+
+        <section class="secao" data-secao="inicio" aria-labelledby="titulo-inicio">
+            <h1 class="sr-only" id="titulo-inicio">Início</h1>
+            <div class="inicio">
+                <div class="palco">
+                    <img class="palco-mascote" id="inicio-mascote" src="img/mascote/cor-vermelha.jpg" alt="" width="480" height="480">
+                    <div class="palco-dados">
+                        <p class="palco-saudacao" id="inicio-saudacao"></p>
+                        <p class="palco-nivel" id="inicio-nivel"></p>
+                        <div class="barra" role="progressbar" aria-labelledby="inicio-nivel" aria-valuemin="0" aria-valuemax="100" id="inicio-barra">
+                            <span id="inicio-barra-preenchida"></span>
+                        </div>
+                        <p class="palco-progresso" id="inicio-progresso"></p>
+                        <div class="palco-numeros">
+                            <div><strong id="inicio-pontos">0</strong><span>pontos</span></div>
+                            <div><strong id="inicio-doacoes">0</strong><span>doações confirmadas</span></div>
+                            <div><strong id="inicio-missoes">0</strong><span>missões concluídas</span></div>
+                        </div>
+                        <a class="botao" href="#doacoes">Registrar doação</a>
+                    </div>
+                </div>
+
+                <div class="inicio-lado">
+                    <div id="inicio-evento"></div>
+                    <div id="inicio-estoque"></div>
+                    <div class="cartao">
+                        <div class="cartao-topo">
+                            <h2>Próximas missões</h2>
+                            <a class="botao-link" href="#missoes">Ver todas</a>
+                        </div>
+                        <ul class="lista-missoes compacta" id="inicio-lista-missoes"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="doacoes" aria-labelledby="titulo-doacoes" hidden>
+            <h1 class="titulo-secao" id="titulo-doacoes">Doações</h1>
+            <div class="duas-colunas">
+                <div class="coluna">
+                    <form class="cartao formulario" id="form-doacao">
+                        <h2>Registrar doação</h2>
+                        <p class="ajuda">Doou hoje? Registre aqui. O hemocentro confirma depois, e só então os pontos entram.</p>
+                        <div class="campo">
+                            <label for="doa-local">Onde você doou</label>
+                            <select id="doa-local" name="idLocal" data-locais>
+                                <option value="">Prefiro não informar</option>
+                            </select>
+                        </div>
+                        <p class="erro-form" role="alert" hidden></p>
+                        <button type="submit" class="botao">Registrar doação</button>
+                    </form>
+                    <div class="cartao intervalo" id="doacoes-intervalo"></div>
+                </div>
+                <div class="coluna">
+                    <h2 class="subtitulo">Histórico</h2>
+                    <p class="vazio" id="historico-vazio" hidden>Nenhuma doação registrada ainda. A primeira vale a missão "Registrar uma doação".</p>
+                    <ol class="historico" id="lista-historico"></ol>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="missoes" aria-labelledby="titulo-missoes" hidden>
+            <h1 class="titulo-secao" id="titulo-missoes">Missões e conquistas</h1>
+            <div class="duas-colunas larga-esquerda">
+                <div class="coluna">
+                    <div id="grupos-missoes"></div>
+                </div>
+                <div class="coluna">
+                    <h2 class="subtitulo">Conquistas</h2>
+                    <ul class="conquistas" id="lista-conquistas"></ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="mascote" aria-labelledby="titulo-mascote" hidden>
+            <h1 class="titulo-secao" id="titulo-mascote">Mascote</h1>
+            <div class="mascote">
+                <div class="mascote-vitrine">
+                    <img id="mascote-atual" src="img/mascote/cor-vermelha.jpg" alt="" width="480" height="480">
+                    <p class="mascote-nome" id="mascote-nome"></p>
+                    <p class="ajuda" id="mascote-descricao"></p>
+                    <p class="mascote-contagem" id="mascote-contagem"></p>
+                </div>
+                <div class="mascote-colecao">
+                    <h2 class="subtitulo">Cores</h2>
+                    <ul class="visuais" id="visuais-cores"></ul>
+                    <h2 class="subtitulo">Acessórios</h2>
+                    <p class="ajuda">Os acessórios aparecem no mascote vermelho. Um visual por vez.</p>
+                    <ul class="visuais" id="visuais-acessorios"></ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="hemocentros" aria-labelledby="titulo-hemocentros" hidden>
+            <h1 class="titulo-secao" id="titulo-hemocentros">Hemocentros</h1>
+            <h2 class="subtitulo">Estoque de sangue hoje</h2>
+            <p class="ajuda">Dados simulados. Tipos em estado crítico precisam de doadores com urgência.</p>
+            <ul class="estoque" id="lista-estoque"></ul>
+            <div class="duas-colunas">
+                <div class="coluna">
+                    <h2 class="subtitulo">Campanhas</h2>
+                    <ul class="campanhas" id="lista-campanhas"></ul>
+                </div>
+                <div class="coluna">
+                    <h2 class="subtitulo">Locais de doação</h2>
+                    <ul class="locais" id="lista-locais"></ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="como-doar" aria-labelledby="titulo-como-doar" hidden>
+            <h1 class="titulo-secao" id="titulo-como-doar">Como doar</h1>
+            <div class="duas-colunas larga-esquerda">
+                <div class="coluna texto-longo">
+                    <h2 class="subtitulo">Quem pode doar</h2>
+                    <ul class="requisitos">
+                        <li><strong>Idade entre 16 e 69 anos.</strong> Menores de 18 precisam da autorização dos responsáveis.
+                            Entre 60 e 69 anos, só pode doar quem já doou antes dos 60.</li>
+                        <li><strong>Peso a partir de 50 kg.</strong></li>
+                        <li><strong>Documento oficial com foto.</strong></li>
+                        <li><strong>Ter dormido pelo menos 6 horas</strong> nas últimas 24 horas.</li>
+                        <li><strong>Estar alimentado.</strong> Evite comida gordurosa nas 3 horas antes e, depois do almoço, espere 2 horas.</li>
+                        <li><strong>Estar com boa saúde</strong> no dia da doação.</li>
+                    </ul>
+
+                    <details class="cartao detalhe" id="detalhe-intervalo">
+                        <summary>Quanto tempo esperar entre uma doação e outra</summary>
+                        <div class="detalhe-corpo">
+                            <p><strong>Homens:</strong> 2 meses entre as doações, até 4 doações por ano.</p>
+                            <p><strong>Mulheres:</strong> 3 meses entre as doações, até 3 doações por ano.</p>
+                            <p>O intervalo é o tempo que o corpo leva para repor o sangue doado.</p>
+                        </div>
+                    </details>
+
+                    <details class="cartao detalhe">
+                        <summary>Impedimentos temporários mais comuns</summary>
+                        <div class="detalhe-corpo">
+                            <p>Gripe, resfriado ou febre, bebida alcoólica nas últimas 12 horas, tatuagem recente
+                                e alguns procedimentos médicos impedem a doação por um tempo. O hemocentro avalia cada caso
+                                na triagem, antes da coleta.</p>
+                        </div>
+                    </details>
+                    <p class="fonte">Fonte: Ministério da Saúde. Confirme as regras com o hemocentro antes de doar.</p>
+                </div>
+                <div class="coluna">
+                    <div class="cartao passo-a-passo">
+                        <h2>Como é a doação</h2>
+                        <ol>
+                            <li><strong>Cadastro</strong> com documento na recepção do hemocentro.</li>
+                            <li><strong>Triagem:</strong> pressão, temperatura, teste de anemia e uma entrevista sigilosa.</li>
+                            <li><strong>Coleta:</strong> cerca de 450 ml de sangue, em poucos minutos.</li>
+                            <li><strong>Lanche</strong> e descanso antes de ir embora.</li>
+                        </ol>
+                        <a class="botao" href="#hemocentros">Encontrar um hemocentro</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="perfil" aria-labelledby="titulo-perfil" hidden>
+            <h1 class="titulo-secao" id="titulo-perfil">Meu perfil</h1>
+            <div class="duas-colunas">
+                <div class="coluna">
+                    <div class="cartao ficha">
+                        <img id="ficha-mascote" src="img/mascote/cor-vermelha.jpg" alt="" width="120" height="120">
+                        <div>
+                            <p class="ficha-papel" id="ficha-papel"></p>
+                            <h2 id="ficha-nome"></h2>
+                            <p class="ajuda" id="ficha-email"></p>
+                            <p class="ficha-tipo" id="ficha-tipo"></p>
+                        </div>
+                    </div>
+                    <div class="cartao">
+                        <h2>O que você pode fazer</h2>
+                        <ul class="permissoes" id="ficha-permissoes"></ul>
+                    </div>
+                </div>
+                <div class="coluna">
+                    <form class="cartao formulario" id="form-perfil" novalidate>
+                        <h2>Editar dados</h2>
+                        <div class="campo">
+                            <label for="per-nome">Nome completo</label>
+                            <input id="per-nome" name="nome" required maxlength="120">
+                        </div>
+                        <div class="campos-linha">
+                            <div class="campo">
+                                <label for="per-nasc">Data de nascimento</label>
+                                <input id="per-nasc" name="dataNasc" type="date">
+                            </div>
+                            <div class="campo">
+                                <label for="per-telefone">Telefone</label>
+                                <input id="per-telefone" name="telefone" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="campo">
+                            <label for="per-tipo">Tipo sanguíneo</label>
+                            <select id="per-tipo" name="idTipoSanguineo" data-tipos>
+                                <option value="">Não informado</option>
+                            </select>
+                        </div>
+                        <p class="erro-form" role="alert" hidden></p>
+                        <button type="submit" class="botao">Salvar alterações</button>
+                    </form>
+                    <div class="exclusao">
+                        <h2>Excluir conta</h2>
+                        <p>Apaga a sua conta, o histórico de doações, as missões, as conquistas e o mascote. Não dá para desfazer.</p>
+                        <button type="button" class="botao botao-contorno" id="botao-excluir">Excluir conta</button>
+                        <div class="exclusao-confirmar" id="exclusao-confirmar" hidden>
+                            <button type="button" class="botao botao-perigo" id="botao-excluir-sim">Sim, excluir minha conta</button>
+                            <button type="button" class="botao-link" id="botao-excluir-nao">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="secao" data-secao="painel" aria-labelledby="titulo-painel" hidden>
+            <h1 class="titulo-secao" id="titulo-painel">Painel do hemocentro</h1>
+            <p class="ajuda painel-ajuda">Doações registradas pelos doadores e ainda não confirmadas. Confira na sua lista de coletas antes de confirmar: a confirmação dá os pontos ao doador.</p>
+            <p class="vazio" id="pendentes-vazio" hidden>Nenhuma doação esperando confirmação.</p>
+            <ul class="pendentes" id="lista-pendentes"></ul>
+        </section>
+
+    </main>
+
+    <footer class="rodape">
+        <p>HemoPlay é um projeto acadêmico (AEP, 4º semestre de ADS). Os dados dos hemocentros são simulados.</p>
+    </footer>
+</div>
+
+<div class="celebracao" id="celebracao" role="dialog" aria-modal="true" aria-labelledby="celebracao-titulo" hidden>
+    <div class="celebracao-caixa">
+        <img id="celebracao-mascote" src="img/mascote/cor-vermelha.jpg" alt="" width="480" height="480">
+        <p class="celebracao-rotulo">Novo nível</p>
+        <h2 id="celebracao-titulo"></h2>
+        <p id="celebracao-texto"></p>
+        <button type="button" class="botao" id="celebracao-fechar">Continuar</button>
+    </div>
+</div>
+
+<div class="avisos" id="avisos" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

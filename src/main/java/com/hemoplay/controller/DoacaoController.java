@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,14 +26,12 @@ public class DoacaoController {
         this.doacaoService = doacaoService;
     }
 
-    // RF05: o doador registra a doação (status REGISTRADA)
     @PostMapping("/doacoes")
     public ResponseEntity<DoacaoResponse> registrar(@Valid @RequestBody DoacaoRequest request) {
         Doacao doacao = doacaoService.registrar(request.idUsuario(), request.idLocal());
         return ResponseEntity.status(HttpStatus.CREATED).body(DoacaoResponse.from(doacao));
     }
 
-    // RF05: Administrador ou Responsável pelo Hemocentro confirmam (status CONFIRMADA)
     @PatchMapping("/doacoes/{id}/confirmar")
     public DoacaoResponse confirmar(@PathVariable Long id,
                                     @Valid @RequestBody ConfirmarDoacaoRequest request) {
@@ -40,7 +39,13 @@ public class DoacaoController {
         return DoacaoResponse.from(doacao);
     }
 
-    // RF06: histórico do usuário
+    @GetMapping("/doacoes/pendentes")
+    public List<DoacaoResponse> pendentes(@RequestParam Long idUsuario) {
+        return doacaoService.listarPendentes(idUsuario).stream()
+                .map(DoacaoResponse::from)
+                .toList();
+    }
+
     @GetMapping("/usuarios/{idUsuario}/doacoes")
     public List<DoacaoResponse> historico(@PathVariable Long idUsuario) {
         return doacaoService.historico(idUsuario).stream()
