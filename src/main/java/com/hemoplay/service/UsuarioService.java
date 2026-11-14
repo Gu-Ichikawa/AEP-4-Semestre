@@ -1,5 +1,11 @@
 package com.hemoplay.service;
 
+import java.time.LocalDate;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.hemoplay.model.Doador;
 import com.hemoplay.model.Nivel;
 import com.hemoplay.model.TipoSanguineo;
@@ -7,10 +13,6 @@ import com.hemoplay.model.Usuario;
 import com.hemoplay.repository.NivelRepository;
 import com.hemoplay.repository.TipoSanguineoRepository;
 import com.hemoplay.repository.UsuarioRepository;
-import java.time.LocalDate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -21,17 +23,19 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final TipoSanguineoRepository tipoSanguineoRepository;
     private final NivelRepository nivelRepository;
+    private final GamificacaoService gamificacaoService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public UsuarioService(UsuarioRepository usuarioRepository,
                           TipoSanguineoRepository tipoSanguineoRepository,
-                          NivelRepository nivelRepository) {
+                          NivelRepository nivelRepository,
+                          GamificacaoService gamificacaoService) {
         this.usuarioRepository = usuarioRepository;
         this.tipoSanguineoRepository = tipoSanguineoRepository;
         this.nivelRepository = nivelRepository;
+        this.gamificacaoService = gamificacaoService;
     }
 
-    // RF01: cadastro de doador. O tipo sanguíneo é opcional (RF02).
     public Usuario cadastrar(String nome, String email, String senha,
                              LocalDate dataNasc, String telefone, Long idTipoSanguineo) {
         if (usuarioRepository.existsByEmail(email)) {
@@ -41,23 +45,24 @@ public class UsuarioService {
         Doador doador = new Doador();
         doador.setNome(nome);
         doador.setEmail(email);
-        doador.setSenha(encoder.encode(senha));   // guarda o hash, nunca a senha pura
+        doador.setSenha(encoder.encode(senha));
         doador.setDataNasc(dataNasc);
         doador.setTelefone(telefone);
         doador.setTipoSanguineo(buscarTipoSanguineo(idTipoSanguineo));
         doador.setNivel(buscarNivelInicial());
+        doador.setMascoteCor(MascoteService.VISUAL_PADRAO);
 
-        return usuarioRepository.save(doador);
+        Usuario salvo = usuarioRepository.save(doador);
+        gamificacaoService.aoAtualizarCadastro(salvo);
+        return salvo;
     }
 
-    // RF02: consulta do perfil
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long idUsuario) {
         return usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
     }
 
-    // RF02: atualização do perfil. E-mail e senha não mudam por aqui.
     public Usuario atualizarPerfil(Long idUsuario, String nome, String telefone,
                                    LocalDate dataNasc, Long idTipoSanguineo) {
         Usuario usuario = buscarPorId(idUsuario);
@@ -65,10 +70,10 @@ public class UsuarioService {
         usuario.setTelefone(telefone);
         usuario.setDataNasc(dataNasc);
         usuario.setTipoSanguineo(buscarTipoSanguineo(idTipoSanguineo));
-        return usuario; // o JPA grava as alterações ao fim da transação
+        gamificacaoService.aoAtualizarCadastro(usuario);
+        return usuario;
     }
 
-    // CRUD: exclusão. As doações do usuário são removidas pelo ON DELETE CASCADE do banco.
     public void excluir(Long idUsuario) {
         usuarioRepository.delete(buscarPorId(idUsuario));
     }

@@ -1,5 +1,8 @@
 package com.hemoplay.model;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -12,12 +15,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.util.List;
 
-// Classe abstrata: não pode ser instanciada diretamente (pilar 1 de POO).
-// SINGLE_TABLE: todas as subclasses ficam na tabela "usuario".
-// A coluna tipo_usuario diz qual subclasse é cada linha.
 @Entity
 @Table(name = "usuario")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -35,7 +33,6 @@ public abstract class Usuario {
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    // Guarda o hash BCrypt, nunca a senha em texto puro
     @Column(name = "senha", nullable = false, length = 100)
     private String senha;
 
@@ -65,7 +62,6 @@ public abstract class Usuario {
     protected Usuario() {
     }
 
-    // Método abstrato: cada subclasse precisa responder com a sua própria lista (pilar 2 e 3 de POO)
     public abstract List<String> obterPermissoes();
 
     public Long getIdUsuario() { return idUsuario; }
@@ -80,7 +76,6 @@ public abstract class Usuario {
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
     public int getPontuacao() { return pontuacao; }
-    public void setPontuacao(int pontuacao) { this.pontuacao = pontuacao; }
     public String getMascoteCor() { return mascoteCor; }
     public void setMascoteCor(String mascoteCor) { this.mascoteCor = mascoteCor; }
     public String getMascoteAcessorios() { return mascoteAcessorios; }
@@ -90,5 +85,12 @@ public abstract class Usuario {
     public Nivel getNivel() { return nivel; }
     public void setNivel(Nivel nivel) { this.nivel = nivel; }
     public boolean possuiPermissao(String permissao) {return obterPermissoes().contains(permissao);}
+
+    public void adicionarPontos(int pontos) {
+        if (pontos <= 0) {
+            throw new IllegalArgumentException("A quantidade de pontos deve ser positiva.");
+        }
+        this.pontuacao += pontos;
+    }
     
 }

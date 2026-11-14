@@ -27,7 +27,6 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // RF01: cadastro
     @PostMapping
     public ResponseEntity<UsuarioResponse> cadastrar(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = usuarioService.cadastrar(
@@ -40,13 +39,11 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioResponse.from(usuario));
     }
 
-    // RF02: consulta do perfil
     @GetMapping("/{id}")
     public UsuarioResponse buscar(@PathVariable Long id) {
         return UsuarioResponse.from(usuarioService.buscarPorId(id));
     }
 
-    // RF02: atualização do perfil
     @PutMapping("/{id}")
     public UsuarioResponse atualizar(@PathVariable Long id,
                                      @Valid @RequestBody AtualizarUsuarioRequest request) {
@@ -59,7 +56,6 @@ public class UsuarioController {
         return UsuarioResponse.from(usuario);
     }
 
-    // CRUD: exclusão
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         usuarioService.excluir(id);

@@ -15,7 +15,6 @@ public record UsuarioRequest(
         @Size(max = 150)
         String email,
 
-        // O BCrypt só considera os 72 primeiros bytes da senha
         @NotBlank(message = "Senha é obrigatória")
         @Size(min = 6, max = 72, message = "Senha deve ter entre 6 e 72 caracteres")
         String senha,
